@@ -12,11 +12,18 @@ pipeline {
       }
     }
 
-    stage('Install Dependencies') {
-      steps {
-        sh 'npm install'
-      }
-    }
+   stage('Install Dependencies') {
+  steps {
+    sh '''
+      # Set NPM cache directory to a workspace-local folder
+      mkdir -p .npm_cache
+      npm config set cache .npm_cache
+
+      # Now install dependencies
+      npm install
+    '''
+  }
+}
 
     stage('Build React App') {
       steps {
@@ -25,20 +32,17 @@ pipeline {
     }
 
     stage('Serve React App') {
-      steps {
-        sh '''
-          # Install serve if not already
-          npm install -g serve
+  steps {
+    sh '''
+      # Kill existing port 3000 processes
+      fuser -k 3000/tcp || true
 
-          # Kill any process running on port 3000
-          fuser -k 3000/tcp || true
+      # Use npx to serve the app without global install
+      npx serve -s build -l 3000 &
 
-          # Serve the React build
-          serve -s build -l 3000 &
-          
-          echo "✅ React app running at http://<EC2_PUBLIC_IP>:3000"
-        '''
-      }
-    }
+      echo "✅ App running at http://<EC2_PUBLIC_IP>:3000"
+    '''
+  }
+}
   }
 }
