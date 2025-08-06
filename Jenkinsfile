@@ -13,12 +13,17 @@ pipeline {
       }
     }
 
-    stage('Install Dependencies') {
+  stage('Install Dependencies') {
   steps {
     sh '''
       export HOME=$(pwd)
       mkdir -p .npm_cache
       npm config set cache $(pwd)/.npm_cache
+
+      # 🔥 Clean up previous installs
+      rm -rf node_modules package-lock.json
+
+      # ✅ Fresh install
       npm install
     '''
   }
