@@ -12,14 +12,18 @@ pipeline {
       }
     }
 
-   stage('Install Dependencies') {
+  stage('Install Dependencies') {
   steps {
     sh '''
-      # Set NPM cache directory to a workspace-local folder
+      # Create a safe npm config and cache directory inside workspace
+      mkdir -p .npm_config
       mkdir -p .npm_cache
-      npm config set cache .npm_cache
 
-      # Now install dependencies
+      # Tell npm to use them (override default config and cache paths)
+      npm config set cache $(pwd)/.npm_cache
+      npm config set userconfig $(pwd)/.npm_config/.npmrc
+
+      # Now install dependencies safely
       npm install
     '''
   }
