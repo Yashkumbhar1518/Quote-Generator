@@ -1,49 +1,31 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:18'
-      args '-u 0'   // 👈 run as root inside the container
-    }
-  }
+  agent any
 
   stages {
-    stage('Clone Repo') {
+    stage('Clone Repository') {
       steps {
         checkout scm
       }
     }
 
-  stage('Install Dependencies') {
-  steps {
-    sh '''
-      export HOME=$(pwd)
-      mkdir -p .npm_cache
-      npm config set cache $(pwd)/.npm_cache
-
-      # 🔥 Clean up previous installs
-      rm -rf node_modules package-lock.json
-
-      # ✅ Fresh install
-      npm install
-    '''
-  }
-}
-
-    stage('Build React App') {
+    stage('Build Docker Image') {
       steps {
-        sh 'npm run build'
+        sh 'docker build -t react-app .'
       }
     }
 
-    stage('Serve React App') {
+    stage('Run React App in Container') {
       steps {
         sh '''
-          fuser -k 3000/tcp || true
-          npx serve -s build -l 3000 &
-          echo "✅ App running at http://<EC2_PUBLIC_IP>:3000"
+          # Stop old container if running
+          docker rm -f react-container || true
+
+          # Run new container
+          docker run -d -p 3000:80 --name react-container react-app
+
+          echo "✅ React app is running at http://<your-ec2-ip>:3000"
         '''
       }
     }
   }
 }
-
