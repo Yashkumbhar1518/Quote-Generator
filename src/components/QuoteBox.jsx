@@ -5,7 +5,7 @@ function QuoteBox({ quote, getNewQuote }) {
     <div className="quote-box">
       <p className="quote">“{quote.text}”</p>
       <p className="author">— {quote.author}</p>
-      <button onClick={getNewQuote}>Enter New Quote</button>
+      <button onClick={getNewQuote}>New Quote</button>
     </div>
   );
 }
