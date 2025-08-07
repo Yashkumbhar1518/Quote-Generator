@@ -1,5 +1,4 @@
-er import React from 'react';
-
+import React from 'react';
 function QuoteBox({ quote, getNewQuote }) {
   return (
     <div className="quote-box">
