@@ -1,10 +1,10 @@
 pipeline {
     agent {
-        docker {
-            image 'node:18'
-            args '-u root:root'
-        }
+    docker {
+        image 'node:18'
+        args '-p 3000:3000'
     }
+}
 
     environment {
         NPM_CONFIG_CACHE = "${WORKSPACE}/.npm"
@@ -29,11 +29,11 @@ pipeline {
             }
         }
         stage('Serve App') {
-            steps {
-                sh 'npm install -g serve'
-                sh "nohup serve -s build -l 3000 > serve.log 2>&1 &"
-            }
-        }
+    steps {
+        sh 'npm install -g serve'
+        sh "nohup serve -s build -l tcp://0.0.0.0:3000 > serve.log 2>&1 &"
+    }
+}
     }
 
     post {
