@@ -16,14 +16,11 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Clean Old Dependencies') {
+        stage('Clean & Install Dependencies') {
             steps {
                 sh 'rm -rf node_modules package-lock.json build'
-            }
-        }
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install --legacy-peer-deps'
+                sh 'npm install ajv@^8 ajv-keywords@^5 --save-dev'
+                sh 'npm ci --legacy-peer-deps'
             }
         }
         stage('Build React App') {
@@ -42,9 +39,6 @@ pipeline {
     post {
         success {
             echo "✅ App running at: http://<EC2-PUBLIC-IP>:3000"
-        }
-        failure {
-            echo "❌ Build failed — check Jenkins logs."
         }
     }
 }
