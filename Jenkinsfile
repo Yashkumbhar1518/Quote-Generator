@@ -16,9 +16,14 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Clean Workspace') {
+            steps {
+                sh 'rm -rf node_modules package-lock.json build'
+            }
+        }
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                sh 'npm install --legacy-peer-deps'
             }
         }
         stage('Build React App') {
