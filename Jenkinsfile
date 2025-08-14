@@ -2,7 +2,7 @@ pipeline {
     agent {
     docker {
         image 'node:18'
-        args '-p 3000:3000'
+        args '-u root'
     }
 }
 
@@ -16,6 +16,11 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Clean Workspace') {
+    steps {
+        sh 'sudo rm -rf node_modules build'
+    }
+}
         stage('Clean & Install Dependencies') {
             steps {
                 sh 'rm -rf node_modules package-lock.json build'
