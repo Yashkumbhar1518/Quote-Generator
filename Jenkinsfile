@@ -16,7 +16,7 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Clean Workspace') {
+        stage('Clean Old Dependencies') {
             steps {
                 sh 'rm -rf node_modules package-lock.json build'
             }
@@ -42,6 +42,9 @@ pipeline {
     post {
         success {
             echo "✅ App running at: http://<EC2-PUBLIC-IP>:3000"
+        }
+        failure {
+            echo "❌ Build failed — check Jenkins logs."
         }
     }
 }
