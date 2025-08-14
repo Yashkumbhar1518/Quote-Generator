@@ -2,7 +2,12 @@ pipeline {
     agent {
         docker {
             image 'node:18'
+            args '-u root:root'
         }
+    }
+
+    environment {
+        NPM_CONFIG_CACHE = "${WORKSPACE}/.npm"
     }
 
     stages {
@@ -21,20 +26,17 @@ pipeline {
                 sh 'npm run build'
             }
         }
-        stage('Deploy and Run App') {
+        stage('Serve App') {
             steps {
                 sh 'npm install -g serve'
-                // Kill any existing serve process
-                sh "pkill -f 'serve' || true"
-                // Start app in background (host network so it’s reachable via EC2 IP)
-                sh 'nohup serve -s build -l 3000 > serve.log 2>&1 &'
+                sh "nohup serve -s build -l 3000 > serve.log 2>&1 &"
             }
         }
     }
 
     post {
         success {
-            echo "✅ App deployed! Visit: http://<EC2-PUBLIC-IP>:3000"
+            echo "✅ App running at: http://<EC2-PUBLIC-IP>:3000"
         }
     }
 }
